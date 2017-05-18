@@ -4,7 +4,7 @@ const pg = require('pg');
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6550;
 const app = express();
 // const conString = 'postgres://localhost:5432';// TODO: Don't forget to set your own conString
 const conString = 'postgres://postgres:Sidirume&7@localhost:5432/kilovolt';
@@ -41,31 +41,35 @@ app.post('/articles', function(request, response) {
       request.body.authorUrl], // TODO: Add the author and "authorUrl" as data for the SQL query
     function(err) {
       if (err) console.error(err)
-      // queryTwo() // This is our second query, to be executed when this first query is complete.
+      queryTwo() // This is our second query, to be executed when this first query is complete.
     }
   )
 
-  // function queryTwo() {
-  //   client.query(
-  //     ``, // TODO: Write a SQL query to retrieve the author_id from the authors table for the new article
-  //     [], // TODO: Add the author name as data for the SQL query
-  //     function(err, result) {
-  //       if (err) console.error(err)
-  //       queryThree(result.rows[0].author_id) // This is our third query, to be executed when the second is complete. We are also passing the author_id into our third query
-  //     }
-  //   )
-  // }
-  //
-  // function queryThree(author_id) {
-  //   client.query(
-  //     ``, // TODO: Write a SQL query to insert the new article using the author_id from our previous query
-  //     [], // TODO: Add the data from our new article, including the author_id, as data for the SQL query.
-  //     function(err) {
-  //       if (err) console.error(err);
-  //       response.send('insert complete');
-  //     }
-  //   );
-  // }
+  function queryTwo() {console.log('queryTwo');
+    client.query(
+      `SELECT author_id FROM authors WHERE author=$1`, // TODO: Write a SQL query to retrieve the author_id from the authors table for the new article
+      [request.body.author], // TODO: Add the author name as data for the SQL query
+      function(err, result) {
+        if (err) console.error(err)
+        queryThree(result.rows[0].author_id) // This is our third query, to be executed when the second is complete. We are also passing the author_id into our third query
+      }
+    )
+  }
+
+  function queryThree(author_id) {console.log('queryThree');
+    client.query(
+      `INSERT INTO articles(author_id, title, category, "publishedOn", body) VALUES($1, $2, $3, $4, $5)`, // TODO: Write a SQL query to insert the new article using the author_id from our previous query
+      [author_id,
+        request.body.title,
+        request.body.category,
+        request.body.publishedOn,
+        request.body.body,], // TODO: Add the data from our new article, including the author_id, as data for the SQL query.
+      function(err) {
+        if (err) console.error(err);
+        response.send('insert complete');
+      }
+    );
+  }
 });
 
 app.put('/articles/:id', function(request, response) {
