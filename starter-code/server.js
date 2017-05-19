@@ -126,7 +126,6 @@ app.listen(PORT, function() {
   console.log(`Server started on port ${PORT}!`);
 });
 
-
 //////// ** DATABASE LOADERS ** ////////
 ////////////////////////////////////////
 // REVIEW: This helper function will load authors into the DB if the DB is empty
