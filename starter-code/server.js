@@ -68,7 +68,7 @@ app.post('/articles', function(request, response) {
         if (err) console.error(err);
         response.send('insert complete');
       }
-    );
+    ); 
   }
 });
 
